@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en" style="scroll-behavior: smooth;">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Isaac Hayab</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- CHANGED FONT TO ORBITRON for a high-tech, futuristic look -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <style>
+        body {
+            /* Applied 'Orbitron' to the entire body */
+            font-family: 'Orbitron', sans-serif;
+            /* LIGHT MODE: Very light gray background */
+            background-color: #e2e8f0; /* Slightly darker than F0F`4F8 to show glass effect better */
+            /* Ensure enough content height for scrolling */
+            min-height: 250vh; 
+            color: #1f2937; /* Default text color set to dark for light mode */
+        }
+        main section {
+            scroll-margin-top: 5rem; 
+            /* Set a uniform, subtle light background image to emphasize the blur effect */
+            background-image: url('https://placehold.co/1200x800/e2e8f0/e2e8f0'); 
+            background-size: cover;
+            background-position: center;
+        }
+
+        /* Custom smooth scrolling for internal links (overrides default browser scroll) */
+        .smooth-scroll {
+            transition: all 0.5s ease-in-out;
+        }
+
+        /* --- Adaptive Positioning --- */
+
+        /* Base (Mobile): Fixed Bottom Center */
+        .adaptive-navbar {
+            position: fixed;
+            bottom: 1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            /* Max width ensures it remains a dock, even if screen is huge */
+            max-width: 24rem; /* Adjusted for 5 icons */
+            width: 90%; 
+            z-index: 50;
+        }
+
+        /* Medium/Desktop: Fixed Bottom Right */
+        @media (min-width: 768px) {
+            .adaptive-navbar {
+                bottom: 2rem;
+                right: 2rem;
+                left: auto; /* Undo left positioning */
+                transform: translateX(0); /* Undo transform positioning */
+                max-width: fit-content; /* Only take up space needed for icons */
+                width: auto;
+            }
+        }
+        
+        /* Ensure the canvas container takes up space */
+        #cube-container {
+            width: 100%;
+            height: 300px; /* Default height for mobile/small screens */
+        }
+
+        @media (min-width: 768px) {
+            #cube-container {
+                width: 50%;
+                height: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ADAPTIVE FLOATING DOCK CONTAINER - STRONG LIGHT GLASS EFFECT -->
+    <header class="adaptive-navbar">
+        <div class="bg-white/80 backdrop-blur-xl rounded-full shadow-2xl transition-all duration-300 border border-gray-300 p-2 md:p-1">
+
+            <!-- NAVBAR: Icons are aligned in a row for mobile and desktop -->
+            <nav class="flex items-center justify-between space-x-1 md:space-x-2">
+                
+                <!-- Home Icon -->
+                <a href="#home" class="relative flex items-center justify-center w-10 h-10 p-2 rounded-full text-gray-700 hover:text-gray-700 hover:bg-gray-200 transition duration-150 group smooth-scroll" aria-label="Go to Home Section">
+                    <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                    <!-- Tooltip -->
+                    <span class="absolute z-50 bottom-full mb-2 left-1/2 -translate-x-1/2 
+                                 opacity-0 group-hover:opacity-100 group-focus:opacity-100 transition-opacity duration-300
+                                 bg-gray-800 text-white text-xs px-2 py-1 rounded-md shadow-lg pointer-events-none">
+                        Home
+                    </span>
+                </a>
+
+                <!-- About Icon -->
+                <a href="#about" class="relative flex items-center justify-center w-10 h-10 p-2 rounded-full text-gray-700 hover:text-gray-700 hover:bg-gray-200 transition duration-150 group smooth-scroll" aria-label="Go to About Section">
+                    <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    <!-- Tooltip -->
+                    <span class="absolute z-50 bottom-full mb-2 left-1/2 -translate-x-1/2 
+                                 opacity-0 group-hover:opacity-100 group-focus:opacity-100 transition-opacity duration-300
+                                 bg-gray-800 text-white text-xs px-2 py-1 rounded-md shadow-lg pointer-events-none">
+                        About
+                    </span>
+                </a>
+                
+                <!-- Projects Icon -->
+                <a href="#projects" class="relative flex items-center justify-center w-10 h-10 p-2 rounded-full text-gray-700 hover:text-gray-700 hover:bg-gray-200 transition duration-150 group smooth-scroll" aria-label="Go to Projects Section">
+                    <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22h16c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2H8c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2Z"/><path d="M10 2v4"/><path d="M16 2v4"/><path d="M2 10h20"/></svg>
+                    <!-- Tooltip -->
+                    <span class="absolute z-50 bottom-full mb-2 left-1/2 -translate-x-1/2 
+                                 opacity-0 group-hover:opacity-100 group-focus:opacity-100 transition-opacity duration-300
+                                 bg-gray-800 text-white text-xs px-2 py-1 rounded-md shadow-lg pointer-events-none">
+                        Projects
+                    </span>
+                </a>
+                
+                <!-- Skills Icon (Code) -->
+                <a href="#skills" class="relative flex items-center justify-center w-10 h-10 p-2 rounded-full text-gray-700 hover:text-gray-700 hover:bg-gray-200 transition duration-150 group smooth-scroll" aria-label="Go to Skills Section">
+                    <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                    <!-- Tooltip -->
+                    <span class="absolute z-50 bottom-full mb-2 left-1/2 -translate-x-1/2 
+                                 opacity-0 group-hover:opacity-100 group-focus:opacity-100 transition-opacity duration-300
+                                 bg-gray-800 text-white text-xs px-2 py-1 rounded-md shadow-lg pointer-events-none">
+                        Skills
+                    </span>
+                </a>
+                
+                <!-- Contact Icon -->
+                <a href="#contact" class="relative flex items-center justify-center w-10 h-10 p-2 rounded-full text-gray-700 hover:text-gray-700 hover:bg-gray-200 transition duration-150 group smooth-scroll" aria-label="Go to Contact Section">
+                    <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+                    <!-- Tooltip -->
+                    <span class="absolute z-50 bottom-full mb-2 left-1/2 -translate-x-1/2 
+                                 opacity-0 group-hover:opacity-100 group-focus:opacity-100 transition-opacity duration-300
+                                 bg-gray-800 text-white text-xs px-2 py-1 rounded-md shadow-lg pointer-events-none">
+                        Contact
+                    </span>
+                </a>
+
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="py-12 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+
+        <!-- Home Section - HERO SECTION WITH 3D CUBE -->
+        <section id="home" class="h-screen flex flex-col md:flex-row items-center justify-between bg-white/80 backdrop-blur-xl rounded-2xl shadow-2xl mb-16 border border-white/50 p-8">
+            
+            <!-- Text Content (Left Aligned) -->
+            <div class="md:w-1/2 w-full text-center md:text-left p-4">
+                <!-- 1. Name in Bold -->
+                <h1 class="text-6xl font-extrabold text-gray-900 mb-2">Isaac Hayab</h1>
+                
+                <!-- 2. Title Below Name -->
+                <p class="text-2xl text-gray-700 font-semibold mb-6">Software Engineer & Web3 Developer</p>
+                
+                <!-- 3. Description -->
+                <p class="text-xl text-gray-700 max-w-2xl">
+                    Focused on <b>modular software engineering</b>, <b>scalable backend systems</b>, and high-impact digital solutions.
+                </p>
+                
+                <!-- 4. Download Resume Button -->
+                <div class="mt-8">
+                    <a href="resume.pdf" download class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
+                        Download Resume
+                    </a>
+                </div>
+            </div>
+
+            <!-- 3D Cube Container (Right Side) -->
+            <div id="cube-container" class="md:w-1/2 w-full mt-8 md:mt-0 flex items-center justify-center">
+                <!-- Three.js will inject the canvas here -->
+            </div>
+        </section>
+
+        <!-- About Section - NEW GLASS SECTION -->
+        <section id="about" class="min-h-[70vh] flex flex-col justify-center bg-white/80 backdrop-blur-xl p-10 rounded-2xl shadow-2xl mb-16 border border-white/50">
+            <h2 class="text-4xl font-bold text-gray-800 mb-6 border-b pb-2">About Isaac</h2>
+            <div class="space-y-6 text-lg text-gray-700 max-w-3xl">
+                <p>I’m a <b>Backend & Full-Stack Engineer</b> who builds modular, scalable, and reliable software systems. My core focus is <b>backend architecture</b>, <b>microservices</b>, and <b>system design</b>—using <b>Go</b>, <b>JavaScript/TypeScript</b>, and cloud-native tools.</p>
+                <p>I care deeply about writing clean, maintainable software that scales without breaking and integrates seamlessly across services. I pride myself on optimizing systems for performance and ensuring long-term stability.</p>
+                <p>Beyond backend engineering, I also build modern full-stack applications with <b>Next.js</b>, <b>Tailwind</b>, and <b>Prisma</b>, and explore <b>Web3</b> with smart contracts and decentralized app integrations.</p>
+                <p>I enjoy solving real-world problems, constantly optimizing development workflows, and delivering solutions that actually matter—not just look good on GitHub.</p>
+            </div>
+        </section>
+
+        <!-- Projects Section - NOW GLASS -->
+        <section id="projects" class="min-h-[120vh] bg-white/80 backdrop-blur-xl p-10 rounded-2xl shadow-2xl mb-16 border border-white/50">
+            <h2 class="text-4xl font-bold text-gray-800 mb-8 border-b pb-2">Featured Projects</h2>
+            <div class="space-y-8 text-gray-700">
+                
+                <!-- Project Card 1 - NOW GLASS -->
+                <div class="p-6 bg-white/80 backdrop-blur-sm rounded-xl shadow-lg border border-gray-200">
+                    <h3 class="text-2xl font-bold text-gray-900">Cloud Storage Backend (Dropbox-Style)</h3>
+                    <p class="mt-2 text-gray-700">Built the backend engine powering a Dropbox-style file system: users can upload, download, share and manage files via API endpoints.</p>
+                    <!-- Space for Links -->
+                    <div class="mt-4 pt-4 border-t border-gray-300 flex space-x-4">
+                        <a href="https://github.com/ayo-69/dropbox-clone-api" class="inline-flex items-center text-sm font-medium text-gray-800 bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded-lg transition duration-150">
+                            View Project
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Project Card 2 - NOW GLASS -->
+                <div class="p-6 bg-white/80 backdrop-blur-sm rounded-xl shadow-lg border border-gray-200">
+                    <h3 class="text-2xl font-bold text-gray-800">Decentralized Voting System</h3>
+                    <p class="mt-2 text-gray-700">A full-featured backend service that replicates Dropbox functionality — enabling user authentication, secure file uploads, downloads, storage with MinIO, and metadata management using MongoDB in a production-ready, containerized architecture.</p>
+                    
+                    <!-- Space for Links -->
+                    <div class="mt-4 pt-4 border-t border-gray-300 flex space-x-4">
+                        <a href="https://github.com/ayo-69/solidity-voting-system" class="inline-flex items-center text-sm font-medium text-gray-800 bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded-lg transition duration-150">
+                            View Project
+                        </a>
+                    </div>
+                </div>
+
+                    <!-- Project Card 1 - NOW GLASS -->
+                <div class="p-6 bg-white/80 backdrop-blur-sm rounded-xl shadow-lg border border-gray-200">
+                    <h3 class="text-2xl font-bold text-gray-900">Pandoc Converter</h3>
+                    <p class="mt-2 text-gray-700">A web app built with Flask and Pandoc that lets users upload documents and convert them into multiple formats via a clean browser UI.</p>
+                    
+                    <!-- Space for Links -->
+                    <div class="mt-4 pt-4 border-t border-gray-300 flex space-x-4">
+                        <a href="https://github.com/ayo-69/pandoc-converter" class="inline-flex items-center text-sm font-medium text-gray-800 bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded-lg transition duration-150">
+                            View Project
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Project Card 2 - NOW GLASS -->
+                <div class="p-6 bg-white/80 backdrop-blur-sm rounded-xl shadow-lg border border-gray-200">
+                    <h3 class="text-2xl font-bold text-gray-800">Backend Service for EduTrackr (API & Data Layer)</h3>
+                    <p class="mt-2 text-gray-700">Designed and implemented the backend for EduTrackr, handling authentication, course data, and real-time tracking with a focus on reliability and performance.</p>
+                    
+                    <!-- Space for Links -->
+                    <div class="mt-4 pt-4 border-t border-gray-300 flex space-x-4">
+                        <a href="https://github.com/ayo-69/edutrackr-backend" class="inline-flex items-center text-sm font-medium text-gray-800 bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded-lg transition duration-150">
+                            View Project
+                        </a>
+                    </div>
+
+                </div>
+
+                <!-- Project Card 2 - NOW GLASS -->
+                <div class="p-6 bg-white/80 backdrop-blur-sm rounded-xl shadow-lg border border-gray-200">
+                    <h3 class="text-2xl font-bold text-gray-800">E-Commerce Platform API (Node.js/Express)</h3>
+                    <p class="mt-2 text-gray-700">Built a full RESTful backend supporting catalog management, user roles, cart operations and order tracking for e-commerce applications.</p>
+                    
+                    <!-- Space for Links -->
+                    <div class="mt-4 pt-4 border-t border-gray-300 flex space-x-4">
+                        <a href="https://github.com/ayo-69/e-commerce-backend" class="inline-flex items-center text-sm font-medium text-gray-800 bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded-lg transition duration-150">
+                            View Project
+                        </a>
+                    </div>
+
+                </div>
+
+                <!-- Project Card 2 - NOW GLASS -->
+                <div class="p-6 bg-white/80 backdrop-blur-sm rounded-xl shadow-lg border border-gray-200">
+                    <h3 class="text-2xl font-bold text-gray-800">Blogging Platform Backend</h3>
+                    <p class="mt-2 text-gray-700">full-featured backend framework for a blogging platform, handling posts, comments, user roles and content management.</p>
+                    
+                    <!-- Space for Links -->
+                    <div class="mt-4 pt-4 border-t border-gray-300 flex space-x-4">
+                        <a href="https://github.com/ayo-69/blogging-platform" class="inline-flex items-center text-sm font-medium text-gray-800 bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded-lg transition duration-150">
+                            View Project
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- Skills Section - NOW GLASS -->
+        <section id="skills" class="min-h-[100vh] bg-white/80 backdrop-blur-xl p-10 rounded-2xl shadow-2xl mb-16 border border-white/50">
+            <h2 class="text-4xl font-bold text-gray-800 mb-6 border-b pb-2">Core Skills</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                
+                <!-- Skill Card 1 - NOW GLASS -->
+                <div class="bg-white/80 backdrop-blur-sm p-6 rounded-lg shadow-md border-t-4 border-gray-500">
+                    <p class="text-2xl font-semibold text-gray-900 mb-1">Backend</p>
+                    <p class="text-base text-gray-600">Go, JavaScript, TypeScript, Express.js, Gin</p>
+                </div>
+
+                <!-- Skill Card 2 - NOW GLASS -->
+                <div class="bg-white/80 backdrop-blur-sm p-6 rounded-lg shadow-md border-t-4 border-gray-500">
+                    <p class="text-2xl font-semibold text-gray-900 mb-1">Databases</p>
+                    <p class="text-base text-gray-600">MongoDB, PostgreSQL, MySQL, Redis</p>
+                </div>
+
+                <!-- Skill Card 3 - NOW GLASS -->
+                <div class="bg-white/80 backdrop-blur-sm p-6 rounded-lg shadow-md border-t-4 border-gray-500">
+                    <p class="text-2xl font-semibold text-gray-900 mb-1">API & Server Architecture</p>
+                    <p class="text-base text-gray-600">API Design & Development, Server Performance & Scalability, Microservices</p>
+                </div>
+
+                <!-- Skill Card 4 - NOW GLASS -->
+                <div class="bg-white/80 backdrop-blur-sm p-6 rounded-lg shadow-md border-t-4 border-gray-500">
+                    <p class="text-2xl font-semibold text-gray-900 mb-1">DevOps</p>
+                    <p class="text-base text-gray-600">Docker, CI/CD, Linux ( arch btw )</p>
+                </div>
+                
+                <!-- Skill Card 5 - NOW GLASS -->
+                <div class="bg-white/80 backdrop-blur-sm p-6 rounded-lg shadow-md border-t-4 border-gray-500">
+                    <p class="text-2xl font-semibold text-gray-900 mb-1">Frontend</p>
+                    <p class="text-base text-gray-600">React, Next.js, Tailwind CSS, Zustand, Material UI</p>
+                </div>
+                
+                <!-- Skill Card 6 - NOW GLASS -->
+                <div class="bg-white/80 backdrop-blur-sm p-6 rounded-lg shadow-md border-t-4 border-gray-500">
+                    <p class="text-2xl font-semibold text-gray-900 mb-1">Web3</p>
+                    <p class="text-base text-gray-600">Solidity, Foundry, Hardhat, Ethers.js, wagmi, rainbowkit</p>
+                </div>
+
+                <!-- Skill Card 7 - NOW GLASS -->
+                <div class="bg-white/80 backdrop-blur-sm p-6 rounded-lg shadow-md border-t-4 border-gray-500">
+                    <p class="text-2xl font-semibold text-gray-900 mb-1">General Programming & CS Concepts</p>
+                    <p class="text-base text-gray-600">Clean Code, Unit & Integration Testing, API Design & Documentation, Event-Driven Architecture</p>
+                </div>
+
+                <!-- Skill Card 8 - NOW GLASS -->
+                <div class="bg-white/80 backdrop-blur-sm p-6 rounded-lg shadow-md border-t-4 border-gray-500">
+                    <p class="text-2xl font-semibold text-gray-900 mb-1">Curiosity + Learning Drive</p>
+                    <p class="text-base text-gray-600">Self-Learning & Growth, Problem-Solving & Research</p>
+                </div>
+            </div>
+            
+        </section>
+
+        <!-- Contact Section - NOW GLASS (with Functional Form) -->
+        <section id="contact" class="min-h-[70vh] bg-white/80 backdrop-blur-xl p-10 rounded-2xl shadow-2xl mb-8 flex flex-col items-center border border-white/50">
+            <h2 class="text-4xl font-bold text-gray-800 mb-6 border-b pb-2">Let's Connect & Collaborate</h2>
+            <p class="text-lg text-gray-700 mb-8 text-center max-w-lg">
+                Tell me about your project, budget, and goals. I'm excited to discuss new challenges in software development or engineering.
+            </p>
+
+            <form id="contactForm" action="/localhost:3000/send-email" method="post" class="w-full max-w-lg space-y-6">
+                
+                <!-- Name and Email (Side-by-side on desktop) -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                        <input type="text" id="name" required class="w-full p-3 border border-gray-300 rounded-lg bg-white/60 backdrop-blur-sm focus:ring-gray-600 focus:border-gray-600 transition duration-150" placeholder="John Doe">
+                    </div>
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+                        <input type="email" id="email" required class="w-full p-3 border border-gray-300 rounded-lg bg-white/60 backdrop-blur-sm focus:ring-gray-600 focus:border-gray-600 transition duration-150" placeholder="john.doe@example.com">
+                    </div>
+                </div>
+
+                <!-- Budget - CHANGED TO INPUT -->
+                <div>
+                    <label for="budget" class="block text-sm font-medium text-gray-700 mb-1">Project Budget Estimate ($)</label>
+                    <input type="number" id="budget" required 
+                           class="w-full p-3 border border-gray-300 rounded-lg bg-white/60 backdrop-blur-sm focus:ring-gray-600 focus:border-gray-600 transition duration-150" 
+                           placeholder="e.g., 10000" min="0">
+                </div>
+
+                <!-- Message/Description -->
+                <div>
+                    <label for="message" class="block text-sm font-medium text-gray-700 mb-1">Project Description / Message</label>
+                    <textarea id="message" rows="4" required class="w-full p-3 border border-gray-300 rounded-lg bg-white/60 backdrop-blur-sm focus:ring-gray-600 focus:border-gray-600 transition duration-150" placeholder="Tell me more about your engineering challenge..."></textarea>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" class="w-full px-8 py-3 text-lg font-semibold rounded-lg bg-gray-800 text-white shadow-xl hover:bg-gray-900 transition duration-150 focus:ring-4 focus:ring-gray-600 focus:ring-opacity-50">
+                    Send
+                </button>
+            </form>
+
+            <div id="successMessage" class="hidden text-center py-10">
+                 <svg xmlns="http://www.w3.org/2000/svg" class="w-16 h-16 text-green-500 mx-auto mb-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                <p class="text-3xl font-bold text-gray-900 mb-2">Message Sent!</p>
+                <p class="text-lg text-gray-700">Thank you for reaching out. Isaac will review your details and get back to you shortly.</p>
+            </div>
+        </section>
+        
+    </main>
+
+    <script>
+        // Smooth scrolling logic for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // Form submission logic
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('contactForm');
+            const successMessage = document.getElementById('successMessage');
+
+            if (form && successMessage) {
+                form.addEventListener('submit', (e) => {
+                    e.preventDefault();
+
+                    const name = document.getElementById('name').value;
+                    const email = document.getElementById('email').value;
+                    const budget = document.getElementById('budget').value;
+                    const message = document.getElementById('message').value;
+
+                    fetch('http://localhost:3000/send-email', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ name, email, budget, message })
+                    })
+                    .then(response => response.text())
+                    .then(data => {
+                        console.log(data);
+                        // Simulate success: hide form, show message
+                        form.classList.add('hidden');
+                        successMessage.classList.remove('hidden');
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+                });
+            }
+        });
+
+        // --- Three.js 3D Cube Animation ---
+
+        let scene, camera, renderer, cube, container;
+
+        function initCube() {
+            container = document.getElementById('cube-container');
+            if (!container) return;
+
+            const width = container.clientWidth;
+            const height = container.clientHeight;
+
+            // 1. Scene
+            scene = new THREE.Scene();
+
+            // 2. Camera
+            camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
+            camera.position.z = 5;
+
+            // 3. Renderer
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(width, height);
+            
+            // Set pixel ratio for sharp rendering on high-DPI screens
+            renderer.setPixelRatio(window.devicePixelRatio); 
+            
+            // Clear any existing children before appending
+            while (container.firstChild) {
+                container.firstChild.remove();
+            }
+            container.appendChild(renderer.domElement);
+
+            // 4. Geometry (Cube)
+            const geometry = new THREE.BoxGeometry(2, 2, 2);
+
+            // 5. Material (Transparent with Black Outline)
+            const material = new THREE.MeshBasicMaterial({
+                color: 0xffffff,
+                transparent: true,
+                opacity: 0.2, // Make it slightly visible/glassy
+                wireframe: false
+            });
+            cube = new THREE.Mesh(geometry, material);
+            scene.add(cube);
+            
+            // 6. Edges (Black Outline)
+            const edges = new THREE.EdgesGeometry(geometry);
+            const line = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({ color: 0x1f2937, linewidth: 2 }));
+            cube.add(line);
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            if (cube) {
+                // Rotate the cube continuously
+                cube.rotation.x += 0.005;
+                cube.rotation.y += 0.005;
+            }
+
+            if (renderer) {
+                renderer.render(scene, camera);
+            }
+        }
+
+        function onWindowResize() {
+            if (container && camera && renderer) {
+                const width = container.clientWidth;
+                const height = container.clientHeight;
+                
+                camera.aspect = width / height;
+                camera.updateProjectionMatrix();
+                renderer.setSize(width, height);
+            }
+        }
+
+        window.addEventListener('resize', onWindowResize, false);
+
+        // Start animation on window load
+        window.onload = function () {
+            initCube();
+            animate();
+        };
+    </script>
+
+</body>
+</html>
